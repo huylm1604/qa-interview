@@ -25,7 +25,7 @@ password: reward_admin
 - Reward form
   - A reward validity period should have both start and end dates.
   - A successful submission only happens when the payload contains all mandatory information.
-  - It should not show up in the rewards listing.
+  - It should show up in the rewards listing.
 - Disabling a section should clear respective information from the form payload
 - If the reward is of private type,
   - All fields related to catalogues, labels, brands, tags and categories should disappaer.
