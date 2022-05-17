@@ -6,11 +6,11 @@ You are allowed to use any test framework of your choice. You can make assumptio
 https://www.perxtech.io/dashboard 
 
 #### Admin Credentials
-email: admin@dashboard.com
+email:  edwin+admin-qa-interview@perxtech.com
 password: admin1234
 
 #### Reward Moderator Credentials
-email: reward_admin@dashboard.com
+email: edwin+reward-admin-qa-interview@perxtech.com
 password: reward_admin
 
 ## Testing authorization of user roles and groups
