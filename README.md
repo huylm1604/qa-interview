@@ -1,6 +1,6 @@
 # QA Interview Integration Tests
 
-You are allowed to use any test framework of your choice. You can make assumptions where necessary. Jest is configured for you. Install with `yarn add` and run the test with `yarn test`.
+The implementation must be in JavaScript. You are allowed to use any test framework of your choice. You can make assumptions where necessary. Jest is configured for you. Install with `yarn add` and run the test with `yarn test`.
 
 ### Staging Dashbaord URL
 https://www.perxtech.io/dashboard 
