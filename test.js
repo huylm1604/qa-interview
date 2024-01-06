@@ -16,11 +16,11 @@ const usersessionApiUrl = "https://api.perxtech.io/v4/dash/user_sessions";
 const authorizationApiUrl = "https://api.perxtech.io/v4/dash/authorizations";
 const rewarddetailApiUrl = "https://api.perxtech.io/v4/dash/rewards";
 
-var token = "";
 
 const request = require("supertest");
 const path = require("path");
 const { Builder, By, WebElementCondition, Key, until } = require("selenium-webdriver");
+const { del } = require("selenium-webdriver/http");
 //const { urlContains } = require("selenium-webdriver/lib/until");
 
 describe("Testing authorization of user roles and groups", () => {
@@ -40,8 +40,6 @@ describe("Testing authorization of user roles and groups", () => {
         }
       }
     }
-
-    // token = response.body.bearer_token;
   });
 });
 
@@ -60,8 +58,6 @@ describe("Creating a reward", () => {
         }
       }
     }
-    // token = response.body.bearer_token;
-    // console.log("token", token);
   });
 
   it("A non-authorized user should not have access to the reward detail/edit page", async function () {
@@ -103,7 +99,6 @@ describe("Creating a reward", () => {
     // To Create new reward
     await driver.manage().setTimeouts({ implicit: 5000 });
     var currentUrl = (await driver.getCurrentUrl()).toString();
-    // console.log(currentUrl);
     expect(currentUrl).toEqual(createNewRewardUrl);
     // Reward form
     var rewardName = "HuyQC_Test";
@@ -119,21 +114,17 @@ describe("Creating a reward", () => {
     );
     const deltaY = parseInt((await datePickerRect.getRect()).y);
     await driver.actions().scroll(0, 0, 0, deltaY).perform();
-    // await driver.executeScript("arguments[0].scrollIntoView(true);", datePickerElement);
     await driver.findElement(By.xpath(datePickerElement)).click();
     const dayElement =
       "/html/body/div[3]/div/div/div/div/div[1]/div[2]/table/tbody/tr[3]/td[4]/div";
     await driver.findElement(By.xpath(dayElement)).click(); // 17 Jan 2024
     await driver.findElement(By.xpath(nextButtonElement)).click(); // Next button
-    expect(
-      await driver
-        .findElement(By.xpath("/html/body/div[2]/div"))
-        .isDisplayed(false)
-    ); // expect no mandatory field is empty, message popup when a mandatory field is empty
+    
     await driver.manage().setTimeouts({ implicit: 5000 });
     const saveButtonElement =
       '//*[@id="root"]/section/section/main/span/div/div[3]/form/div[2]/div/div/div[2]/button[2]';
     await driver.findElement(By.xpath(saveButtonElement)).click(); // Save button
+    // expect no mandatory field is empty, message popup when a mandatory field is empty
     await driver.manage().setTimeouts({ implicit: 5000 });
     const rewardListUrl =
       "https://dashboard.perxtech.io/dashboard/p/rewards/list";
@@ -250,7 +241,7 @@ describe("Upload a file in bulk list", () => {
     await driver.findElement(By.xpath(uploadFile)).sendKeys(csvFile); // upload .csv file
 
 
-    await driver.manage().setTimeouts({ implicit: 5000 });
+    await delay(3000);
     const uploadDialogElement = '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/form/div[2]/span/div[1]/span';
     
     const actionListDropdown = '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/form/div[1]/div/div[2]/div/div/div/div';
@@ -260,7 +251,7 @@ describe("Upload a file in bulk list", () => {
     // expect to be able upload file to other action
     
     await driver.findElement(By.xpath(uploadFileButtonElement)).click(); // upload file
-    await driver.manage().setTimeouts({ implicit: 5000 }); 
+    await delay(3000);
     const createdRecordNameUploadFile = '//*[@id="rc-tabs-0-panel-All"]/div/div/div/div/div/div/table/tbody/tr[1]/td[2]';
     let createdRecord = (await driver.findElement(By.xpath(createdRecordNameUploadFile)).getText()).toString();
     let fileName = csvFile.replace(/^.*[\\/]/, '');
