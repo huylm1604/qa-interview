@@ -1,35 +1,18 @@
-const usernameAdmin = "thao+test-qa-interview@perxtech.com";
-const passwordAdmin = "admin1234";
-const usernameReward = "thao+reward-test-qa-interview@perxtech.com";
-const passwordReward = "reward_admin";
-
-const stagingDashboardUrl = "https://www.perxtech.io/dashboard";
-const stagingDetailRewardUrl =
-  "https://dashboard.perxtech.io/dashboard/p/rewards/show/510";
-const stagingLoginRedirectUrl =
-  "https://dashboard.perxtech.io/dashboard/signin";
-const createNewRewardUrl =
-  "https://dashboard.perxtech.io/dashboard/p/rewards/create/info";
-const bulkActionUrl = 'https://dashboard.perxtech.io/dashboard/p/bulk_actions';
-
-const usersessionApiUrl = "https://api.perxtech.io/v4/dash/user_sessions";
-const authorizationApiUrl = "https://api.perxtech.io/v4/dash/authorizations";
-const rewarddetailApiUrl = "https://api.perxtech.io/v4/dash/rewards";
-
+import { huy, huy1, huy2 } from "./script/api/api-testscript";
+import { page_variables } from "./utils/page-variables";
 
 const request = require("supertest");
 const path = require("path");
-const { Builder, By, WebElementCondition, Key, until } = require("selenium-webdriver");
-const { del } = require("selenium-webdriver/http");
+const { Builder, By} = require("selenium-webdriver");
 //const { urlContains } = require("selenium-webdriver/lib/until");
 
 describe("Testing authorization of user roles and groups", () => {
   it("response usersessionApi", async function () {
-    const response = await request(usersessionApiUrl).post("/").send({
-      email: usernameReward,
-      password: passwordReward,
+    const response = await request(page_variables.usersessionApiUrl).post("/").send({
+      email: page_variables.usernameReward,
+      password: page_variables.passwordReward,
     });
-    expect(response.status).toEqual(201);
+    expect(response).toEqual(201);
     const permissions = response.body.roles[0].permissions;
     for (var p of permissions) {
       for (var k of Object.keys(p)) {
@@ -45,9 +28,9 @@ describe("Testing authorization of user roles and groups", () => {
 
 describe("Creating a reward", () => {
   it("Ensure that a logged in user has sufficient permission to create a reward", async function () {
-    const response = await request(usersessionApiUrl).post("/").send({
-      email: usernameReward,
-      password: passwordReward,
+    const response = await request(page_variables.usersessionApiUrl).post("/").send({
+      email: page_variables.usernameReward,
+      password: page_variables.passwordReward,
     });
     expect(response.status).toEqual(201);
     const permissions = response.body.roles[0].permissions;
@@ -61,7 +44,7 @@ describe("Creating a reward", () => {
   });
 
   it("A non-authorized user should not have access to the reward detail/edit page", async function () {
-    const response = await request(rewarddetailApiUrl)
+    const response = await request(page_variables.rewarddetailApiUrl)
       .get("/510")  // random item with code 510
       .set("Authorization", "abc123");
     expect(response.status).toEqual(401); // unauthorized user
@@ -71,9 +54,9 @@ describe("Creating a reward", () => {
 describe("Visit a non-authorized page should redirect to login", () => {
   it("should redirect to login", async () => {
     let driver = await new Builder().forBrowser("chrome").build();
-    await driver.get(stagingDetailRewardUrl);
+    await driver.get(page_variables.stagingDetailRewardUrl);
     const currentUrl = await driver.getCurrentUrl();
-    expect(currentUrl).toEqual(stagingLoginRedirectUrl);
+    expect(currentUrl).toEqual(page_variables.stagingLoginRedirectUrl);
     await driver.quit();
   }, 30000);
 }, 30000);
@@ -81,9 +64,9 @@ describe("Visit a non-authorized page should redirect to login", () => {
 describe("Creating a reward", () => {
   it("Login to dashboard then to create new rewards", async () => {
     let driver = await new Builder().forBrowser("chrome").build();
-    await driver.get(stagingDashboardUrl);
-    await driver.findElement(By.id("email")).sendKeys(usernameReward);
-    await driver.findElement(By.id("password")).sendKeys(passwordReward);
+    await driver.get(page_variables.stagingDashboardUrl);
+    await driver.findElement(By.id("email")).sendKeys(page_variables.usernameReward);
+    await driver.findElement(By.id("password")).sendKeys(page_variables.passwordReward);
     await driver
       .findElement(
         By.xpath('//*[@id="root"]/section/main/div/aside/div[2]/form/button')
@@ -99,7 +82,7 @@ describe("Creating a reward", () => {
     // To Create new reward
     await driver.manage().setTimeouts({ implicit: 5000 });
     var currentUrl = (await driver.getCurrentUrl()).toString();
-    expect(currentUrl).toEqual(createNewRewardUrl);
+    expect(currentUrl).toEqual(page_variables.createNewRewardUrl);
     // Reward form
     var rewardName = "HuyQC_Test";
     await driver.findElement(By.name("name_en")).sendKeys(rewardName);
@@ -126,9 +109,7 @@ describe("Creating a reward", () => {
     await driver.findElement(By.xpath(saveButtonElement)).click(); // Save button
     // expect no mandatory field is empty, message popup when a mandatory field is empty
     await driver.manage().setTimeouts({ implicit: 5000 });
-    const rewardListUrl =
-      "https://dashboard.perxtech.io/dashboard/p/rewards/list";
-    await driver.get(rewardListUrl);
+    await driver.get(page_variables.rewardListUrl);
     await driver.manage().setTimeouts({ implicit: 5000 });
     const firstRecordElement =
       '//*[@id="root"]/section/section/main/div[2]/div/div/div[3]/div/div/div/div/div/table/tbody/tr[1]/td[1]/a/div';
@@ -143,7 +124,7 @@ describe("Creating a reward", () => {
     await driver.manage().setTimeouts({ implicit: 5000 });
     var currentUrl = (await driver.getCurrentUrl()).toString();
     // console.log(currentUrl);
-    expect(currentUrl).toEqual(createNewRewardUrl);
+    expect(currentUrl).toEqual(page_variables.createNewRewardUrl);
     const privateTypebuttonElement =
       '//*[@id="root"]/section/section/main/span/div/div[3]/form/div[1]/div/div/div[1]/div[2]/div[1]/div/div/div[2]/div/div/div[1]/label[2]/span[1]/input';
     await driver.findElement(By.xpath(privateTypebuttonElement)).click(); // select Private type
@@ -178,14 +159,14 @@ describe("Creating a reward", () => {
 
 describe("Upload a file in bulk list", () => {
   it("Ensure that the logged in user has sufficient permission to visit the builk file upload page and has the ability to upload.", async () => {
-    var response = await request(usersessionApiUrl).post("/").send({
-      email: usernameAdmin,
-      password: passwordAdmin,
+    var response = await request(page_variables.usersessionApiUrl).post("/").send({
+      email: page_variables.usernameAdmin,
+      password: page_variables.passwordAdmin,
     });
     expect(response.status).toEqual(201);
     const token = response.body.bearer_token;
     console.log('token',token);
-    response = await request(authorizationApiUrl)
+    response = await request(page_variables.authorizationApiUrl)
       .get("/")
       .set("Authorization", "Bearer " + token);
     expect(response.status).toEqual(200);
@@ -205,9 +186,9 @@ describe("Upload a file in bulk list", () => {
   }, 30000);
   it("login and upload bulk list", async () => {
     let driver = await new Builder().forBrowser("chrome").build();
-    await driver.get(stagingDashboardUrl);
-    await driver.findElement(By.id("email")).sendKeys(usernameAdmin);
-    await driver.findElement(By.id("password")).sendKeys(passwordAdmin);
+    await driver.get(page_variables.stagingDashboardUrl);
+    await driver.findElement(By.id("email")).sendKeys(page_variables.usernameAdmin);
+    await driver.findElement(By.id("password")).sendKeys(page_variables.passwordAdmin);
     await driver
       .findElement(
         By.xpath('//*[@id="root"]/section/main/div/aside/div[2]/form/button')
@@ -219,17 +200,17 @@ describe("Upload a file in bulk list", () => {
     await driver.findElement(By.xpath(bulkAtionsTabElement)).click();
     await driver.manage().setTimeouts({ implicit: 5000 });
     const currentUrl = (await driver.getCurrentUrl()).toString();
-    expect(currentUrl).toEqual(bulkActionUrl); // expect to be at Bulk Actions tab
+    expect(currentUrl).toEqual(page_variables.bulkActionUrl); // expect to be at Bulk Actions tab
     const uploadButtonElement = '//*[@id="root"]/section/section/main/div[1]/div/div[2]/div/div/button';
     await driver.findElement(By.xpath(uploadButtonElement)).click();
     await driver.manage().setTimeouts({ implicit: 5000 });
 
     const uploadFile = '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/form/div[2]/span/div[1]/span/input';
-    const csvFile = path.resolve('./sample_issue_vouchers.csv');
-    const xlsxFile = path.resolve('./dataExcel.xlsx');
-    const txtFile = path.resolve('./txtFile.txt');
+    const csvFile = path.resolve('./source/files/sample_issue_vouchers.csv');
+    const xlsxFile = path.resolve('./source/files/dataExcel.xlsx');
+    const txtFile = path.resolve('./source/files/txtFile.txt');
+    const imageFile = path.resolve('./source/images/hi-image.png');
 
-    const imageFile = path.resolve('./hi-image.png');
     await driver.findElement(By.xpath(uploadFile)).sendKeys(imageFile);
     const uploadFileButtonElement = '/html/body/div[3]/div/div[2]/div/div[2]/div[3]/button[2]';
     await driver.findElement(By.xpath(uploadFileButtonElement)).click(); // upload file
