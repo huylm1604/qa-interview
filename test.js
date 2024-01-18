@@ -8,12 +8,12 @@ import {
   upload_bulk_list,
 } from "./script/web/web-testscript";
 
-// api_usersession();
+api_usersession();
 
-// creating_reward_api_testscript();
+creating_reward_api_testscript();
 
-// redirect_login_for_unauthorized();
+redirect_login_for_unauthorized();
 
-// creating_rewards();
+creating_rewards();
 
 upload_bulk_list();

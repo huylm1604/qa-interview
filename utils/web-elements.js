@@ -26,7 +26,8 @@ export const web_elements = {
     removeFileButton : '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/form/div[2]/span/div[2]/div/div/div/span/span[2]/button',
     uploadDialogElement : '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/form/div[2]/span/div[1]/span',
     actionListDropdown : '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/form/div[1]/div/div[2]/div/div/div/div',
-    createdRecordNameUploadFile : '//*[@id="rc-tabs-0-panel-All"]/div/div/div/div/div/div/table/tbody/tr[1]/td[2]',
-    popupMessage : 'ant-message-notice'
+    createdRecordNameUploadFile : '//*[@id="rc-tabs-1-panel-All"]/div/div/div/div/div/div/table/tbody/tr[1]/td[2]',
+    popupMessage : 'ant-message-notice',
+    closeUploadDialogButtonElement: '/html/body/div[3]/div/div[2]/div/div[2]/button'
 
 }
